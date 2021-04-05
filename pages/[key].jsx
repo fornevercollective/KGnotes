@@ -13,7 +13,7 @@ const KeyPage = (props) => {
         }
 
         let first = true
-        const socket = new WebSocket('ws://localhost:4000/')
+        const socket = new WebSocket('wss://notes-production.up.railway.app/')
 
         socket.addEventListener('message', (event) => {
             if (first) {
