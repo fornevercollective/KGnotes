@@ -3,7 +3,7 @@ require('dotenv').config({ path: '.env.development' })
 const WebSocket = require('ws')
 const { pages } = require('../lib/deta')
 
-const server = new WebSocket.Server({ port: 4000 })
+const server = new WebSocket.Server({ port: process.env.PORT || 4000 })
 const sockets = {}
 
 server.on('connection', (socket) => {

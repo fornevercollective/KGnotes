@@ -5,8 +5,8 @@
     "license": "MIT",
     "scripts": {
         "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
+        "build": "echo woo",
+        "start": "yarn socket",
         "socket": "node socket/server.js"
     },
     "dependencies": {
