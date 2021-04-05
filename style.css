@@ -1,0 +1,49 @@
+body {
+    font-family: 'IBM Plex Mono', monospace;
+    margin: 0 auto;
+    max-width: 800px;
+    background: white;
+    color: black;
+}
+
+#__next {
+    height: 100vh;
+}
+
+main {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+main h1 {
+    font-weight: normal;
+}
+
+main h1, main p, main button {
+    margin: 10px 0;
+}
+
+main button {
+    cursor: pointer;
+    border: none;
+    background: black;
+    color: white;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 10px 20px;
+}
+
+textarea {
+    border: none;
+    outline: none;
+    font-family: inherit;
+    font-size: inherit;
+    resize: none;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px 10px;
+}
