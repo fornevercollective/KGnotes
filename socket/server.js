@@ -29,7 +29,7 @@ server.on('connection', (socket) => {
             
             socket.send(editable.toString())
         } else if (editable) {
-            await db.set(savedKey, { token, content: message })
+            await db.set(savedKey, { token: savedToken, content: message })
 
             for (let i = 0; i < sockets[savedKey].length; i++) {
                 const updateSocket = sockets[savedKey][i]

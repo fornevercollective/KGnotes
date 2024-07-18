@@ -13,23 +13,23 @@ const KeyPage = (props) => {
         }
 
         let first = true
-        const socket = new WebSocket('wss://notes-production.up.railway.app/')
+        const newSocket = new WebSocket('wss://notes-production.up.railway.app/')
 
-        socket.addEventListener('message', (event) => {
+        newSocket.addEventListener('message', (event) => {
             if (first) {
                 first = false
-                setSocket(socket)
+                setSocket(newSocket)
                 console.info(event.data)
             } else {
                 setValue(event.data)
             }
         })
-        socket.addEventListener('open', () => socket.send(JSON.stringify({
+        newSocket.addEventListener('open', () => newSocket.send(JSON.stringify({
             key: props.pageKey,
             tokens: props.notesTokens
         })))
-        socket.addEventListener('close', () => setSocket(null))
-        socket.addEventListener('error', (error) =>{ 
+        newSocket.addEventListener('close', () => setSocket(null))
+        newSocket.addEventListener('error', (error) =>{ 
             console.error(error)
             setSocket(null)
         })
