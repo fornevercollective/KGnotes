@@ -40,6 +40,7 @@ main button {
 textarea {
     border: none;
     outline: none;
+    background: inherit;
     font-family: inherit;
     font-size: inherit;
     resize: none;
@@ -47,4 +48,16 @@ textarea {
     width: 100%;
     box-sizing: border-box;
     padding: 20px 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #111111;
+        color: white;
+    }
+
+    main button {
+        background: white;
+        color: black;
+    }
 }
