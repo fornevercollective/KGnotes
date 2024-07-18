@@ -1,9 +1,9 @@
-import { nanoid } from 'nanoid/async'
+import { nanoid } from 'nanoid'
 import { db } from '../../lib/s1db'
 import Cookie from 'cookie'
 
 export default async (req, res) => {
-    const token = await nanoid(128)
+    const token = nanoid(128)
 
     {
         const tokens = req.cookies.notesTokens
@@ -14,7 +14,7 @@ export default async (req, res) => {
         res.setHeader('Set-Cookie', cookie)
     }
 
-    const key = await nanoid(8)
+    const key = nanoid(8)
     await db.set(key, {
         token,
         content: ''
