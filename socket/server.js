@@ -29,14 +29,14 @@ server.on('connection', (socket) => {
             
             socket.send(editable.toString())
         } else if (editable) {
-            await db.set(savedKey, { token: savedToken, content: message })
+            await db.set(savedKey, { token: savedToken, content: message.toString('utf-8') })
 
             for (let i = 0; i < sockets[savedKey].length; i++) {
                 const updateSocket = sockets[savedKey][i]
                 if (socket === updateSocket) continue
 
                 try {
-                    updateSocket.send(message)
+                    updateSocket.send(message.toString('utf-8'))
                 } catch {
                     sockets[savedKey].splice(i, 1)
                 }
