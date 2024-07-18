@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react'
-import { pages } from '../lib/deta'
+import { useEffect, useState } from 'react'
+import { db } from '../lib/s1db'
 import Error from 'next/error'
 
 const KeyPage = (props) => {
@@ -58,7 +58,7 @@ export const getServerSideProps = async (ctx) => {
         ? ctx.req.cookies.notesTokens.split(',')
         : []
     
-    const page = await pages.get(ctx.params.key)
+    const page = await db.get(ctx.params.key)
     if (!page) return { props: { error: 404 } }
 
     return {

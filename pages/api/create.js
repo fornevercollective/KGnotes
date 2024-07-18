@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid/async'
-import { pages } from '../../lib/deta'
+import { db } from '../../lib/s1db'
 import Cookie from 'cookie'
 
 export default async (req, res) => {
@@ -15,8 +15,7 @@ export default async (req, res) => {
     }
 
     const key = await nanoid(8)
-    await pages.put({
-        key,
+    await db.set(key, {
         token,
         content: ''
     })
