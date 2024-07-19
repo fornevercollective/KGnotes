@@ -36,21 +36,28 @@ const KeyPage = (props) => {
     }, [ props.pageKey ])
 
     if (props.error) return <Error statusCode={props.error} />
-    
-    return (
-        <textarea
-            autoFocus
-            placeholder={props.editable
-                ? 'Welcome to your notepad. Simple copy the URL to share.'
-                : 'This page is currently empty.'}
-            readOnly={!props.editable || !socket}
-            value={value}
-            onChange={(event) => {
-                setValue(event.target.value)
-                socket.send(event.target.value)
-            }}
-        />
-    )
+
+    if (props.editable) {
+        return (
+            <textarea
+                autoFocus
+                placeholder={'Welcome to your notepad. Simple copy the URL to share.'}
+                readOnly={!socket}
+                value={value}
+                onChange={(event) => {
+                    setValue(event.target.value)
+                    socket.send(event.target.value)
+                }}
+            />
+        )
+    } else {
+        return (
+            <div
+                className={`text-container ${value ? '' : 'is-empty'}`}
+                children={value || 'This page is currently empty.'}
+            />
+        )
+    }
 }
 
 export const getServerSideProps = async (ctx) => {
