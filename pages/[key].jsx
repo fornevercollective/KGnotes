@@ -41,7 +41,7 @@ const KeyPage = (props) => {
         return (
             <textarea
                 autoFocus
-                placeholder={'Welcome to your notepad. Simply copy the URL to share. Only you can edit.'}
+                placeholder={'Welcome to your notepad. Copy the URL to share. Only you can edit.'}
                 readOnly={!socket}
                 value={value}
                 onChange={(event) => {
