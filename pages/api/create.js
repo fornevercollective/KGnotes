@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid'
 import { db } from '../../lib/s1db'
+import { randomPokemon } from '../../lib/pokemon'
 import Cookie from 'cookie'
 
 export default async (req, res) => {
@@ -14,7 +15,7 @@ export default async (req, res) => {
         res.setHeader('Set-Cookie', cookie)
     }
 
-    const key = nanoid(8)
+    const key = `${randomPokemon()}-${randomPokemon()}-${randomPokemon()}`
     await db.set(key, {
         token,
         content: ''
