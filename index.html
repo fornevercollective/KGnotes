@@ -1,1 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>KGnotes</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; font-family: sans-serif; display: flex; height: 100vh; }
+    #sidebar { width: 220px; background: #21222c; color: #fff; padding: 0; display: flex; flex-direction: column; }
+    #notes-list { flex: 1; overflow-y: auto; margin: 0; padding: 0; list-style: none; }
+    #notes-list li { padding: 10px; cursor: pointer; border-left: 4px solid transparent; display: flex; justify-content: space-between; align-items: center;}
+    #notes-list li.active { background: #353746; border-left: 4px solid #51a7ff; }
+    #notes-list li:hover { background: #2a2b38; }
+    #add-note { padding: 10px; border: none; background: #292a36; color: #fff; cursor: pointer; width: 100%; font-size: 1em; }
+    #main { flex: 1; display: flex; flex-direction: column; background: #f5f5f5;}
+    #note-title { border: none; font-size: 1.2em; padding: 12px; margin-bottom: 0; background: #e8e8e8; width: 100%; }
+    #editor, #preview { flex: 1; width: 100%; padding: 16px; border: none; font-size: 1em; font-family: inherit; resize: none; box-sizing: border-box; }
+    #editor { background: #fff; }
+    #preview { background: #f2f2f2; overflow-y: auto; }
+    #actions { display: flex; gap: 10px; padding: 8px; background: #e8e8e8;}
+    .icon-btn { background: none; border: none; color: #888; cursor: pointer; font-size: 1.1em;}
+    .icon-btn:hover { color: #e57373;}
+    @media (max-width: 600px) {
+      #sidebar { width: 120px; }
+      #note-title { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <button id="add-note">+ New Note</button>
+    <ul id="notes-list"></ul>
+  </div>
+  <div id="main">
+    <input id="note-title" placeholder="Note title..." />
+    <div id="actions">
+      <button id="delete-note" class="icon-btn" title="Delete note">🗑️</button>
+      <button id="rename-note" class="icon-btn" title="Rename note">✏️</button>
+      <button id="toggle-preview" class="icon-btn" title="Toggle preview">👁️</button>
+    </div>
+    <textarea id="editor" placeholder="Write your markdown here..."></textarea>
+    <div id="preview" style="display:none;"></div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    // Storage helpers
+    function getNotes() {
+      return JSON.parse(localStorage.getItem('kgnotes_notes') || '[]');
+    }
+    function saveNotes(notes) {
+      localStorage.setItem('kgnotes_notes', JSON.stringify(notes));
+    }
+    function getLastNoteId() {
+      return localStorage.getItem('kgnotes_last_note_id');
+    }
+    function setLastNoteId(id) {
+      localStorage.setItem('kgnotes_last_note_id', id);
+    }
 
+    // State
+    let notes = getNotes();
+    let currentNoteId = getLastNoteId() || (notes[0] && notes[0].id);
+
+    // UI Elements
+    const notesList = document.getElementById('notes-list');
+    const addNoteBtn = document.getElementById('add-note');
+    const noteTitle = document.getElementById('note-title');
+    const editor = document.getElementById('editor');
+    const preview = document.getElementById('preview');
+    const deleteBtn = document.getElementById('delete-note');
+    const renameBtn = document.getElementById('rename-note');
+    const togglePreviewBtn = document.getElementById('toggle-preview');
+
+    // Functions
+    function uuid() {
+      return '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function renderNotesList() {
+      notesList.innerHTML = '';
+      notes.forEach(note => {
+        const li = document.createElement('li');
+        li.className = note.id === currentNoteId ? 'active' : '';
+        li.innerHTML = `<span>${note.title || 'Untitled'}</span>
+          <button class="icon-btn" title="Delete" onclick="event.stopPropagation(); deleteNote('${note.id}')">🗑️</button>`;
+        li.onclick = () => selectNote(note.id);
+        notesList.appendChild(li);
+      });
+    }
+
+    function selectNote(id) {
+      currentNoteId = id;
+      setLastNoteId(id);
+      const note = notes.find(n => n.id === id);
+      noteTitle.value = note.title;
+      editor.value = note.content;
+      updatePreview();
+      renderNotesList();
+    }
+
+    function addNote() {
+      const id = uuid();
+      const note = { id, title: 'Untitled', content: '' };
+      notes.unshift(note);
+      saveNotes(notes);
+      selectNote(id);
+    }
+
+    function deleteNote(id = currentNoteId) {
+      if (!confirm('Delete this note?')) return;
+      notes = notes.filter(n => n.id !== id);
+      saveNotes(notes);
+      if (notes.length) {
+        selectNote(notes[0].id);
+      } else {
+        notes = [];
+        saveNotes(notes);
+        noteTitle.value = '';
+        editor.value = '';
+        preview.innerHTML = '';
+        currentNoteId = null;
+        setLastNoteId('');
+        renderNotesList();
+      }
+    }
+
+    function renameNote() {
+      const newTitle = prompt('Rename note:', noteTitle.value);
+      if (newTitle != null) {
+        noteTitle.value = newTitle;
+        onTitleChange();
+      }
+    }
+
+    function onTitleChange() {
+      const note = notes.find(n => n.id === currentNoteId);
+      if (note) note.title = noteTitle.value;
+      saveNotes(notes);
+      renderNotesList();
+    }
+
+    function onContentChange() {
+      const note = notes.find(n => n.id === currentNoteId);
+      if (note) note.content = editor.value;
+      saveNotes(notes);
+      updatePreview();
+    }
+
+    function updatePreview() {
+      preview.innerHTML = marked.parse(editor.value || '');
+    }
+
+    function togglePreview() {
+      if (preview.style.display === 'none') {
+        updatePreview();
+        preview.style.display = '';
+        editor.style.display = 'none';
+      } else {
+        preview.style.display = 'none';
+        editor.style.display = '';
+      }
+    }
+
+    // Event Listeners
+    addNoteBtn.onclick = addNote;
+    noteTitle.onchange = onTitleChange;
+    editor.oninput = onContentChange;
+    deleteBtn.onclick = () => deleteNote();
+    renameBtn.onclick = renameNote;
+    togglePreviewBtn.onclick = togglePreview;
+
+    // Initialize
+    window.deleteNote = deleteNote; // for inline delete buttons
+    if (!notes.length) addNote();
+    else selectNote(currentNoteId);
+
+    // Keyboard shortcut: Ctrl+N new note, Ctrl+1..9 switch note
+    window.addEventListener('keydown', e => {
+      if (e.ctrlKey && e.key === 'n') {
+        e.preventDefault();
+        addNote();
+      }
+      if (e.ctrlKey && /^[1-9]$/.test(e.key)) {
+        const n = parseInt(e.key) - 1;
+        if (notes[n]) selectNote(notes[n].id);
+      }
+    });
+  </script>
+</body>
+</html>
